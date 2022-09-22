@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Buy cool new product</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <section>
+      <div class="product">
+        <div class="description">
+          <h3>{{item.name}}</h3>
+          <p>{{item.description}}</p>
+          <h5>${{item.price}}</h5>
+        </div>
+      </div>
+      <form action="{% url 'api:item_buy' pk=item.id %}" method="GET">
+        <button type="submit" id="checkout-button">Buy</button>
+      </form>
+    </section>
+  </body>
+</html>
