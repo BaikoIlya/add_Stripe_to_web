@@ -1,6 +1,7 @@
 import stripe
 from django.conf import settings
-from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -17,12 +18,18 @@ def item_view(request, pk):
     """Отоброжает конкретный предмет по ID."""
     item = get_object_or_404(Item, id=pk)
     serializer = ItemSerializer(item)
-    return Response({'item': serializer.data}, template_name='item_page.html')
+    return Response(
+        {
+            'item': serializer.data,
+            'public_key': settings.STRIPE_PUBLIC_KEY
+        },
+        template_name='item_page.html'
+    )
 
 
 @api_view(['GET'])
 def item_buy(request, pk):
-    """Подготовка данных и перенаправление для оплаты."""
+    """Формирование и вывод session.id"""
     item = get_object_or_404(Item, id=pk)
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -43,4 +50,4 @@ def item_buy(request, pk):
         success_url=YOUR_DOMAIN + '/success',
         cancel_url=YOUR_DOMAIN + '/cancel',
     )
-    return redirect(checkout_session.url, code=303)
+    return JsonResponse({'id': checkout_session.id})
